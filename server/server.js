@@ -856,7 +856,9 @@ app.post('/api/alimentos', (req, res) => {
   
   res.json({ id: novoAlimento.id })
 })
-
+app.get('/', (req, res) => {
+  res.send('✅ API de dieta rodando com sucesso!');
+});
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`)
   console.log(`📊 Dados salvos em: data.json`)
