@@ -1,0 +1,442 @@
+.refeicoes-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.refeicoes-header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.refeicoes-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.calorias-summary {
+  display: flex;
+  justify-content: center;
+}
+
+.calorias-badge {
+  background: white;
+  padding: 15px 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.calorias-badge.abaixo {
+  border-left: 5px solid #FF9800;
+}
+
+.calorias-badge.ok {
+  border-left: 5px solid #4CAF50;
+}
+
+.calorias-badge.acima {
+  border-left: 5px solid #F44336;
+}
+
+.calorias-badge .calorias-total {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.calorias-badge .calorias-info {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.add-button {
+  display: block;
+  margin: 0 auto 30px;
+  padding: 15px 30px;
+  background: white;
+  color: #667eea;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.add-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.refeicao-form {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+  margin-top: 10px;
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+}
+
+.refeicoes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.refeicoes-section {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.section-title {
+  color: #667eea;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  text-transform: capitalize;
+}
+
+.refeicoes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.refeicao-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: transform 0.2s;
+}
+
+.refeicao-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.refeicao-content {
+  flex: 1;
+}
+
+.refeicao-content h3 {
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.refeicao-details {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.refeicao-calorias {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.delete-button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.empty-state {
+  text-align: center;
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  color: #666;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.empty-state p:first-child {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.alimentos-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #667eea;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.alimento-item {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.alimento-item:hover {
+  background: #f5f5f5;
+}
+
+.alimento-item:last-child {
+  border-bottom: none;
+}
+
+.alimento-nome {
+  font-weight: 500;
+  color: #333;
+}
+
+.alimento-calorias {
+  font-size: 0.85rem;
+  color: #667eea;
+}
+
+.alimento-selecionado {
+  margin-top: 8px;
+  padding: 8px;
+  background: #e8f5e9;
+  border-radius: 6px;
+  color: #2e7d32;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.calorias-calculadas {
+  color: #2e7d32;
+  font-size: 1.1rem;
+}
+
+.refeicao-form-container {
+  margin-bottom: 30px;
+}
+
+.refeicao-form h2 {
+  color: #667eea;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.adicionar-item-section {
+  margin: 25px 0;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.adicionar-item-section h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.btn-adicionar-item {
+  padding: 12px 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-adicionar-item:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.btn-adicionar-item:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.itens-refeicao {
+  margin: 25px 0;
+  padding: 20px;
+  background: #f0f7ff;
+  border-radius: 10px;
+  border: 2px solid #e3f2fd;
+}
+
+.itens-refeicao h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.itens-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.item-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item-nome {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.item-detalhes {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.btn-remover-item {
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-remover-item:hover {
+  background: #cc0000;
+}
+
+.total-refeicao {
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.jejum-info {
+  padding: 20px;
+  background: #e8f5e9;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.jejum-info p {
+  color: #2e7d32;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.itens-resumo {
+  margin: 10px 0;
+  font-size: 0.9rem;
+}
+
+.item-resumo {
+  color: #666;
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .refeicoes-header h1 {
+    font-size: 2rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .refeicoes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
