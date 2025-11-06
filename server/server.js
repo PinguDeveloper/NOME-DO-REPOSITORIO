@@ -8,9 +8,22 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const app = express()
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 
-app.use(cors())
+// Configurar CORS - permite Netlify e localhost
+// Em produção, permite todas as origens para facilitar
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? true // Permite todas as origens em produção
+  : [
+      'https://dietaapp.netlify.app',
+      'http://localhost:5173',
+      'http://localhost:3000'
+    ]
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}))
 app.use(express.json())
 
 // Caminho para o arquivo de dados JSON

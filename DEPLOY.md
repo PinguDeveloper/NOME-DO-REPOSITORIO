@@ -73,11 +73,15 @@ O projeto já está configurado para deploy no Vercel! Siga os passos abaixo.
    - Configure:
      - **Name:** controle-dieta-backend
      - **Environment:** Node
-     - **Build Command:** `cd server && npm install`
-     - **Start Command:** `cd server && npm start`
-     - **Root Directory:** `server`
+     - **Build Command:** `npm install` (deixe em branco ou use isso)
+     - **Start Command:** `npm start` (deixe em branco ou use isso)
+     - **Root Directory:** `server` ⚠️ **IMPORTANTE: Isso é essencial!**
    - Adicione variável de ambiente: `PORT=3000`
    - Clique em "Create Web Service"
+   
+   **⚠️ IMPORTANTE:** O arquivo `render.yaml` já foi criado na raiz do projeto. Se você usar esse arquivo:
+   - No Render, clique em "Apply render.yaml" ou configure manualmente como acima
+   - O Root Directory DEVE ser `server` (sem barra, sem src/)
 
 2. **Frontend:**
    - Clique em "New +" → "Static Site"
