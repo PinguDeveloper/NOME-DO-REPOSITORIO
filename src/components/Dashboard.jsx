@@ -1,16 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../utils/api'
+import { LoadingSpinner } from './LoadingSpinner'
+import { showToast } from '../utils/toast'
+import { requestNotificationPermission, checkAndNotifyGoals } from '../utils/notifications'
 import './Dashboard.css'
-
-const AGUA_META = 4000 // 4 litros em ml
-
-const CALORIA_META = 1600 // Meta fixa de 1600 calorias
 
 function Dashboard() {
   const [refeicoes, setRefeicoes] = useState([])
   const [agua, setAgua] = useState({ total: 0, registros: [] })
   const [showWarning, setShowWarning] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [metas, setMetas] = useState({ calorias: 1600, agua: 4000 })
   
   // Data atual sempre atualizada
   const currentDate = new Date()
@@ -23,18 +24,33 @@ function Dashboard() {
 
   const loadData = useCallback(async () => {
     try {
-      const [refeicoesData, aguaData] = await Promise.all([
-        api.buscarRefeicoes(),
-        api.buscarAgua()
+      setLoading(true)
+      const [refeicoesData, aguaData, metasData] = await Promise.all([
+        api.buscarRefeicoes().catch(err => {
+          showToast.error('Erro ao carregar refeições')
+          return []
+        }),
+        api.buscarAgua().catch(err => {
+          showToast.error('Erro ao carregar água')
+          return { total: 0, registros: [] }
+        }),
+        api.buscarMetas().catch(() => ({ calorias: 1600, agua: 4000 }))
       ])
       setRefeicoes(refeicoesData)
       setAgua(aguaData)
+      setMetas(metasData)
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
+      showToast.error('Erro ao carregar dados')
+    } finally {
+      setLoading(false)
     }
   }, [])
 
   useEffect(() => {
+    // Solicitar permissão de notificações
+    requestNotificationPermission()
+    
     loadData()
     
     const handleFocus = () => loadData()
@@ -49,6 +65,9 @@ function Dashboard() {
       clearInterval(interval)
     }
   }, [loadData])
+
+  const CALORIA_META = metas.calorias
+  const AGUA_META = metas.agua
 
   const totalCalorias = refeicoes.reduce((sum, r) => {
     // Se a refeição tem itens, somar os itens, senão usar calorias_total ou calorias
@@ -99,6 +118,14 @@ function Dashboard() {
       }
     }
   }, [ultrapassou, showWarning])
+
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <LoadingSpinner fullScreen />
+      </div>
+    )
+  }
 
   return (
     <div className="dashboard-container">
@@ -227,6 +254,15 @@ function Dashboard() {
         </Link>
         <Link to="/agua" className="action-button">
           💧 Registrar Água
+        </Link>
+        <Link to="/historico" className="action-button">
+          📅 Histórico
+        </Link>
+        <Link to="/metas" className="action-button">
+          🎯 Ajustar Metas
+        </Link>
+        <Link to="/compartilhar" className="action-button">
+          📤 Compartilhar
         </Link>
       </div>
     </div>

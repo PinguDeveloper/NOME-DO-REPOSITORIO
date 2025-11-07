@@ -4,6 +4,36 @@
   padding: 30px 20px;
 }
 
+.graficos-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.grafico-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.grafico-card h3 {
+  color: #666;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+[data-theme="dark"] .grafico-card {
+  background: #2a2a2a;
+  color: white;
+}
+
+[data-theme="dark"] .grafico-card h3 {
+  color: #ccc;
+}
+
 .relatorio-header {
   text-align: center;
   margin-bottom: 30px;

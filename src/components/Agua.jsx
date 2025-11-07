@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { api } from '../utils/api'
+import { LoadingSpinner } from './LoadingSpinner'
+import { showToast } from '../utils/toast'
 import './Agua.css'
 
-const AGUA_META = 4000 // 4 litros em ml
 const OPCOES_AGUA = [
   { label: 'Copo 200ml', quantidade: 200 },
   { label: 'Garrafa 500ml', quantidade: 500 },
@@ -12,9 +13,23 @@ const OPCOES_AGUA = [
 function Agua() {
   const [agua, setAgua] = useState({ total: 0, registros: [] })
   const [customAmount, setCustomAmount] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [loadingData, setLoadingData] = useState(true)
+  const [metas, setMetas] = useState({ agua: 4000 })
 
   useEffect(() => {
-    loadAgua()
+    const loadAll = async () => {
+      setLoadingData(true)
+      try {
+        await Promise.all([
+          loadAgua(),
+          api.buscarMetas().then(m => setMetas(m)).catch(() => {})
+        ])
+      } finally {
+        setLoadingData(false)
+      }
+    }
+    loadAll()
     
     const handleFocus = () => loadAgua()
     window.addEventListener('focus', handleFocus)
@@ -27,16 +42,21 @@ function Agua() {
       setAgua(data)
     } catch (error) {
       console.error('Erro ao carregar água:', error)
+      showToast.error('Erro ao carregar água')
     }
   }
 
   const handleAddWater = async (quantidade) => {
     try {
+      setLoading(true)
       await api.adicionarAgua(quantidade)
       await loadAgua()
+      showToast.success(`${quantidade}ml de água adicionados!`)
     } catch (error) {
       console.error('Erro ao adicionar água:', error)
-      alert('Erro ao adicionar água. Verifique se o servidor está rodando.')
+      showToast.error('Erro ao adicionar água. Verifique se o servidor está rodando.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -52,25 +72,40 @@ function Agua() {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir este registro?')) {
       try {
+        setLoading(true)
         await api.deletarAgua(id)
         await loadAgua()
+        showToast.success('Registro excluído com sucesso!')
       } catch (error) {
         console.error('Erro ao deletar registro:', error)
+        showToast.error('Erro ao deletar registro')
+      } finally {
+        setLoading(false)
       }
     }
   }
 
+  const AGUA_META = metas.agua
   const aguaConsumida = agua.total || 0
   const aguaFalta = Math.max(0, AGUA_META - aguaConsumida)
   const porcentagemAgua = (aguaConsumida / AGUA_META) * 100
   const litrosConsumidos = (aguaConsumida / 1000).toFixed(1)
   const litrosFaltam = (aguaFalta / 1000).toFixed(1)
 
+  if (loadingData) {
+    return (
+      <div className="agua-container">
+        <LoadingSpinner fullScreen />
+      </div>
+    )
+  }
+
   return (
     <div className="agua-container">
+      {loading && <LoadingSpinner fullScreen />}
       <div className="agua-header">
         <h1>💧 Controle de Água</h1>
-        <p className="agua-subtitle">Meta diária: 4 litros</p>
+        <p className="agua-subtitle">Meta diária: {(AGUA_META / 1000).toFixed(1)} litros</p>
       </div>
 
       <div className="agua-summary-card">

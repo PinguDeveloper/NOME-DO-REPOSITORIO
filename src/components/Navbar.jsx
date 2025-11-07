@@ -1,8 +1,10 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useTheme } from '../contexts/ThemeContext'
 import './Navbar.css'
 
 function Navbar() {
   const location = useLocation()
+  const { theme, toggleTheme } = useTheme()
 
   const isActive = (path) => {
     return location.pathname === path ? 'active' : ''
@@ -28,6 +30,25 @@ function Navbar() {
           <Link to="/relatorio" className={`nav-link ${isActive('/relatorio')}`}>
             📈 Relatório
           </Link>
+          <Link to="/historico" className={`nav-link ${isActive('/historico')}`}>
+            📅 Histórico
+          </Link>
+          <Link to="/exportar" className={`nav-link ${isActive('/exportar')}`}>
+            📥 Exportar
+          </Link>
+          <Link to="/conquistas" className={`nav-link ${isActive('/conquistas')}`}>
+            🏆 Conquistas
+          </Link>
+          <Link to="/estatisticas" className={`nav-link ${isActive('/estatisticas')}`}>
+            📊 Estatísticas
+          </Link>
+          <button 
+            onClick={toggleTheme}
+            className="theme-toggle"
+            title={theme === 'light' ? 'Modo escuro' : 'Modo claro'}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
         </div>
       </div>
     </nav>

@@ -1,6 +1,19 @@
-// URL da API - usa variável de ambiente em produção ou localhost em desenvolvimento
-const API_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? 'https://seu-backend.onrender.com/api' : 'http://localhost:3000/api')
+// URL da API - usa MODE para detectar produção
+const API_URL =
+  import.meta.env.MODE === "production"
+    ? "https://nome-do-repositorio-2.onrender.com/api"
+    : "http://localhost:3000/api"
+
+// Obter deviceId
+import { getDeviceId } from './deviceId'
+
+// Headers padrão com deviceId
+function getHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'x-device-id': getDeviceId()
+  }
+}
 
 export const api = {
   // Alimentos
@@ -17,104 +30,122 @@ export const api = {
   async calcularCalorias(alimento_id, quantidade, unidade = 'g') {
     const response = await fetch(`${API_URL}/calcular-calorias`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ alimento_id, quantidade, unidade })
+      headers: getHeaders(),
+      body: JSON.stringify({ alimento_id, quantidade, unidade, deviceId: getDeviceId() })
     })
+    if (!response.ok) throw new Error('Erro ao calcular calorias')
     return response.json()
   },
 
   async adicionarAlimento(alimento) {
     const response = await fetch(`${API_URL}/alimentos`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(alimento)
+      headers: getHeaders(),
+      body: JSON.stringify({ ...alimento, deviceId: getDeviceId() })
     })
+    if (!response.ok) throw new Error('Erro ao adicionar alimento')
     return response.json()
   },
 
   // Refeições
   async buscarRefeicoes(data = null) {
-    const url = data ? `${API_URL}/refeicoes?data=${data}` : `${API_URL}/refeicoes`
-    const response = await fetch(url)
+    const url = data 
+      ? `${API_URL}/refeicoes?data=${data}&deviceId=${getDeviceId()}`
+      : `${API_URL}/refeicoes?deviceId=${getDeviceId()}`
+    const response = await fetch(url, { headers: getHeaders() })
+    if (!response.ok) throw new Error('Erro ao buscar refeições')
     return response.json()
   },
 
   async adicionarRefeicao(refeicao) {
     const response = await fetch(`${API_URL}/refeicoes`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(refeicao)
+      headers: getHeaders(),
+      body: JSON.stringify({ ...refeicao, deviceId: getDeviceId() })
     })
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}))
+      throw new Error(error.error || 'Erro ao adicionar refeição')
+    }
     return response.json()
   },
 
   async deletarRefeicao(id) {
     const response = await fetch(`${API_URL}/refeicoes/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getHeaders()
     })
+    if (!response.ok) throw new Error('Erro ao deletar refeição')
     return response.json()
   },
 
   // Água
   async buscarAgua(data = null) {
-    const url = data ? `${API_URL}/agua?data=${data}` : `${API_URL}/agua`
-    const response = await fetch(url)
+    const url = data 
+      ? `${API_URL}/agua?data=${data}&deviceId=${getDeviceId()}`
+      : `${API_URL}/agua?deviceId=${getDeviceId()}`
+    const response = await fetch(url, { headers: getHeaders() })
+    if (!response.ok) throw new Error('Erro ao buscar água')
     return response.json()
   },
 
   async adicionarAgua(quantidade, data = null) {
-    const body = data ? { quantidade, data } : { quantidade }
+    const body = data ? { quantidade, data, deviceId: getDeviceId() } : { quantidade, deviceId: getDeviceId() }
     const response = await fetch(`${API_URL}/agua`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify(body)
     })
+    if (!response.ok) throw new Error('Erro ao adicionar água')
     return response.json()
   },
 
   async deletarAgua(id) {
     const response = await fetch(`${API_URL}/agua/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getHeaders()
     })
+    if (!response.ok) throw new Error('Erro ao deletar água')
     return response.json()
   },
 
   // Relatório
   async buscarRelatorioSemanal() {
-    const response = await fetch(`${API_URL}/relatorio-semanal`)
-    return response.json()
-  },
-
-  // Perfil do usuário e TMB
-  async buscarPerfil() {
-    const response = await fetch(`${API_URL}/perfil`)
-    if (response.status === 404) return null
-    return response.json()
-  },
-
-  async salvarPerfil(perfil) {
-    const response = await fetch(`${API_URL}/perfil`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(perfil)
+    const response = await fetch(`${API_URL}/relatorio-semanal?deviceId=${getDeviceId()}`, {
+      headers: getHeaders()
     })
-    
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Erro ao salvar perfil' }))
-      throw new Error(error.error || `Erro ${response.status}: ${response.statusText}`)
-    }
-    
+    if (!response.ok) throw new Error('Erro ao buscar relatório')
     return response.json()
   },
 
-  async calcularMetaCalorica() {
-    const response = await fetch(`${API_URL}/calcular-meta-calorica`)
-    if (!response.ok) {
-      // Se houver erro, retornar meta padrão
-      return { meta: 1600, tmb: 0 }
-    }
+  // Metas
+  async buscarMetas() {
+    const response = await fetch(`${API_URL}/metas?deviceId=${getDeviceId()}`, {
+      headers: getHeaders()
+    })
+    if (!response.ok) throw new Error('Erro ao buscar metas')
     return response.json()
-  }
+  },
+
+  async atualizarMetas(metas) {
+    const response = await fetch(`${API_URL}/metas`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ ...metas, deviceId: getDeviceId() })
+    })
+    if (!response.ok) throw new Error('Erro ao atualizar metas')
+    return response.json()
+  },
+
+  // Histórico
+  async buscarRefeicoesPorData(data) {
+    return this.buscarRefeicoes(data)
+  },
+
+  async buscarAguaPorData(data) {
+    return this.buscarAgua(data)
+  },
+
 }
 
 

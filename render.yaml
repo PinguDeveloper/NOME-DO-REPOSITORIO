@@ -10,4 +10,12 @@ services:
         value: 3000
       - key: NODE_ENV
         value: production
+      # DATABASE_URL será configurada automaticamente pelo Render quando você conectar o banco PostgreSQL
+      # Não precisa definir aqui, o Render cria automaticamente quando você adiciona um banco PostgreSQL
+
+databases:
+  - name: controle-dieta-db
+    databaseName: controle_dieta
+    user: controle_dieta_user
+    plan: free  # Plano gratuito do Render
 

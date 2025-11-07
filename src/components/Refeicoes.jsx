@@ -1,20 +1,27 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { api } from '../utils/api'
+import { LoadingSpinner } from './LoadingSpinner'
+import { showToast } from '../utils/toast'
+import { debounce } from '../utils/debounce'
+import { SwipeableItem } from './SwipeableItem'
 import './Refeicoes.css'
 
 const TIPOS_REFEICAO = ['jejum', 'café da manhã', 'almoço', 'café da tarde', 'jantar']
-const CALORIA_META = 1600 // Meta fixa de 1600 calorias
 
 function Refeicoes() {
   const [refeicoes, setRefeicoes] = useState([])
   const [alimentos, setAlimentos] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [loadingData, setLoadingData] = useState(true)
+  const [metas, setMetas] = useState({ calorias: 1600 })
   
   // Estado para a refeição sendo criada
   const [refeicaoAtual, setRefeicaoAtual] = useState({
     tipo: 'café da manhã',
-    itens: [] // Array de alimentos
+    itens: [], // Array de alimentos
+    notas: '' // Notas/observações
   })
   
   // Estado para adicionar novo item à refeição
@@ -29,8 +36,19 @@ function Refeicoes() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    loadRefeicoes()
-    loadAlimentos()
+    const loadAll = async () => {
+      setLoadingData(true)
+      try {
+        await Promise.all([
+          loadRefeicoes(),
+          loadAlimentos(),
+          api.buscarMetas().then(m => setMetas(m)).catch(() => {})
+        ])
+      } finally {
+        setLoadingData(false)
+      }
+    }
+    loadAll()
     
     const handleFocus = () => {
       loadRefeicoes()
@@ -45,6 +63,7 @@ function Refeicoes() {
       setRefeicoes(data)
     } catch (error) {
       console.error('Erro ao carregar refeições:', error)
+      showToast.error('Erro ao carregar refeições')
     }
   }
 
@@ -57,14 +76,21 @@ function Refeicoes() {
     }
   }
 
-  const handleSearch = useCallback(async (term) => {
+  const debouncedSearch = useMemo(
+    () => debounce(async (term) => {
+      if (term.length >= 2) {
+        await loadAlimentos(term)
+      } else if (term.length === 0) {
+        await loadAlimentos()
+      }
+    }, 300),
+    []
+  )
+
+  const handleSearch = useCallback((term) => {
     setSearchTerm(term)
-    if (term.length >= 2) {
-      await loadAlimentos(term)
-    } else if (term.length === 0) {
-      await loadAlimentos()
-    }
-  }, [])
+    debouncedSearch(term)
+  }, [debouncedSearch])
 
   const handleAlimentoSelect = async (alimento) => {
     setNovoItem({
@@ -118,10 +144,11 @@ function Refeicoes() {
   // Adicionar item à refeição atual
   const adicionarItemARefeicao = async () => {
     if (!novoItem.alimento_id || !novoItem.quantidade) {
-      alert('Por favor, selecione um alimento e informe a quantidade')
+      showToast.warning('Por favor, selecione um alimento e informe a quantidade')
       return
     }
 
+    setLoading(true)
     // Garantir que as calorias estão calculadas
     let calorias = novoItem.calorias
     if (!calorias || calorias === 0) {
@@ -130,7 +157,8 @@ function Refeicoes() {
         calorias = result.calorias
       } catch (error) {
         console.error('Erro ao calcular calorias:', error)
-        alert('Erro ao calcular calorias. Tente novamente.')
+        showToast.error('Erro ao calcular calorias. Tente novamente.')
+        setLoading(false)
         return
       }
     }
@@ -158,6 +186,8 @@ function Refeicoes() {
       calorias: 0
     })
     setSearchTerm('')
+    setLoading(false)
+    showToast.success('Item adicionado à refeição!')
   }
 
   // Remover item da refeição atual
@@ -170,31 +200,37 @@ function Refeicoes() {
 
   // Salvar refeição completa
   const salvarRefeicao = async () => {
+    setLoading(true)
     // Se for jejum, não precisa de itens
     if (refeicaoAtual.tipo === 'jejum') {
       try {
         const hoje = new Date().toISOString().split('T')[0]
-        await api.adicionarRefeicao({
-          data: hoje,
-          tipo: refeicaoAtual.tipo,
-          itens: [],
-          calorias_total: 0
-        })
+      await api.adicionarRefeicao({
+        data: hoje,
+        tipo: refeicaoAtual.tipo,
+        itens: [],
+        calorias_total: 0,
+        notas: refeicaoAtual.notas
+      })
         
         await loadRefeicoes()
         resetarFormulario()
         setShowForm(false)
+        showToast.success('Jejum registrado com sucesso!')
+        setLoading(false)
         return
       } catch (error) {
         console.error('Erro ao salvar jejum:', error)
-        alert('Erro ao salvar jejum. Verifique se o servidor está rodando.')
+        showToast.error('Erro ao salvar jejum. Verifique se o servidor está rodando.')
+        setLoading(false)
         return
       }
     }
 
     // Para outras refeições, precisa ter pelo menos 1 item
     if (refeicaoAtual.itens.length === 0) {
-      alert('Por favor, adicione pelo menos um alimento à refeição')
+      showToast.warning('Por favor, adicione pelo menos um alimento à refeição')
+      setLoading(false)
       return
     }
 
@@ -206,22 +242,27 @@ function Refeicoes() {
         data: hoje,
         tipo: refeicaoAtual.tipo,
         itens: refeicaoAtual.itens,
-        calorias_total: caloriasTotal
+        calorias_total: caloriasTotal,
+        notas: refeicaoAtual.notas
       })
       
       await loadRefeicoes()
       resetarFormulario()
       setShowForm(false)
+      showToast.success('Refeição salva com sucesso!')
     } catch (error) {
       console.error('Erro ao salvar refeição:', error)
-      alert('Erro ao salvar refeição. Verifique se o servidor está rodando.')
+      showToast.error('Erro ao salvar refeição. Verifique se o servidor está rodando.')
+    } finally {
+      setLoading(false)
     }
   }
 
   const resetarFormulario = () => {
     setRefeicaoAtual({
       tipo: 'café da manhã',
-      itens: []
+      itens: [],
+      notas: ''
     })
     setNovoItem({
       alimento_id: null,
@@ -236,13 +277,20 @@ function Refeicoes() {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir esta refeição?')) {
       try {
+        setLoading(true)
         await api.deletarRefeicao(id)
         await loadRefeicoes()
+        showToast.success('Refeição excluída com sucesso!')
       } catch (error) {
         console.error('Erro ao deletar refeição:', error)
+        showToast.error('Erro ao deletar refeição')
+      } finally {
+        setLoading(false)
       }
     }
   }
+
+  const CALORIA_META = metas.calorias
 
   const totalCalorias = refeicoes.reduce((sum, r) => {
     // Se a refeição tem itens, somar os itens, senão usar calorias_total
@@ -272,8 +320,17 @@ function Refeicoes() {
 
   const caloriasTotalRefeicaoAtual = refeicaoAtual.itens.reduce((sum, item) => sum + item.calorias, 0)
 
+  if (loadingData) {
+    return (
+      <div className="refeicoes-container">
+        <LoadingSpinner fullScreen />
+      </div>
+    )
+  }
+
   return (
     <div className="refeicoes-container">
+      {loading && <LoadingSpinner fullScreen />}
       <div className="refeicoes-header">
         <h1>🍽️ Cadastro de Refeições</h1>
         <div className="calorias-summary">
@@ -446,6 +503,17 @@ function Refeicoes() {
               </div>
             )}
 
+            <div className="form-group">
+              <label>Notas/Observações (opcional)</label>
+              <textarea
+                value={refeicaoAtual.notas}
+                onChange={(e) => setRefeicaoAtual({ ...refeicaoAtual, notas: e.target.value })}
+                placeholder="Adicione observações sobre esta refeição..."
+                rows="3"
+                className="notas-textarea"
+              />
+            </div>
+
             <button 
               type="button"
               onClick={salvarRefeicao}
@@ -476,8 +544,12 @@ function Refeicoes() {
                     : (refeicao.calorias_total || refeicao.calorias || 0)
 
                   return (
-                    <div key={refeicao.id} className="refeicao-card">
-                      <div className="refeicao-content">
+                    <SwipeableItem
+                      key={refeicao.id}
+                      onDelete={() => handleDelete(refeicao.id)}
+                    >
+                      <div className="refeicao-card animated-fade-in">
+                        <div className="refeicao-content">
                         {refeicao.tipo === 'jejum' ? (
                           <>
                             <h3>⏰ Jejum</h3>
@@ -509,14 +581,11 @@ function Refeicoes() {
                           </>
                         )}
                       </div>
-                      <button
-                        onClick={() => handleDelete(refeicao.id)}
-                        className="delete-button"
-                        title="Excluir"
-                      >
-                        🗑️
-                      </button>
-                    </div>
+                        {refeicao.notas && (
+                          <p className="refeicao-notas">📝 {refeicao.notas}</p>
+                        )}
+                      </div>
+                    </SwipeableItem>
                   )
                 })}
               </div>

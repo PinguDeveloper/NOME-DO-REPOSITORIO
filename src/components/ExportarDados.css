@@ -1,0 +1,89 @@
+.exportar-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.exportar-header {
+  text-align: center;
+  margin-bottom: 40px;
+  color: white;
+}
+
+.exportar-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.exportar-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.export-card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.export-card:hover {
+  transform: translateY(-5px);
+}
+
+.export-card h3 {
+  color: #667eea;
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.export-card p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.export-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+}
+
+.export-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.export-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.export-btn.primary {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+[data-theme="dark"] .export-card {
+  background: #2a2a2a;
+  color: white;
+}
+
+[data-theme="dark"] .export-card p {
+  color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .exportar-options {
+    grid-template-columns: 1fr;
+  }
+}
+

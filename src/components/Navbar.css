@@ -63,6 +63,45 @@
   background: #cc0000;
 }
 
+.theme-toggle {
+  padding: 8px 12px;
+  background: transparent;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  background: #667eea;
+  transform: scale(1.1);
+}
+
+[data-theme="dark"] .navbar {
+  background: rgba(30, 30, 30, 0.95);
+}
+
+[data-theme="dark"] .nav-link {
+  color: #ccc;
+}
+
+[data-theme="dark"] .nav-link:hover {
+  background: #3a3a3a;
+  color: white;
+}
+
+[data-theme="dark"] .theme-toggle {
+  border-color: #4ECDC4;
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+  background: #4ECDC4;
+}
+
 @media (max-width: 768px) {
   .navbar-container {
     flex-direction: column;
