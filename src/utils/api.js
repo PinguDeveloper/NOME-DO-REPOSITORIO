@@ -1,6 +1,6 @@
 // URL da API - usa variável de ambiente em produção ou localhost em desenvolvimento
 const API_URL = import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? 'https://nome-do-repositorio-2.onrender.com/api' : 'http://localhost:3000/api')
+ (import.meta.env.PROD ? 'https://controle-dieta.onrender.com/api' : 'http://localhost:3000/api')
 
 // Obter deviceId
 import { getDeviceId } from './deviceId'
