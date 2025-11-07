@@ -663,6 +663,9 @@ app.post('/api/alimentos', async (req, res) => {
     res.status(500).json({ error: 'Erro ao adicionar alimento' })
   }
 })
+app.get('/', (req, res) => {
+  res.send('✅ API de dieta rodando com sucesso!');
+});
 
 // Buscar metas do usuário
 app.get('/api/metas', async (req, res) => {
