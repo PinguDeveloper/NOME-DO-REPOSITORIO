@@ -32,8 +32,6 @@ function Refeicoes() {
     unidade: 'g',
     calorias: 0
   })
-  
-  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const loadAll = async () => {
